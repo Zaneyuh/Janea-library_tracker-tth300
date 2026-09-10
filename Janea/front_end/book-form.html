@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Add New Book</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">📚 Library Tracker</div>
+        <div class="nav-links">
+            <a href="index.html">Dashboard</a>
+            <a href="library.html">View Books</a>
+            <a href="book-form.html" class="btn-primary">+ Add Book</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="form-card">
+            <h1 id="form-heading">Add New Book</h1>
+            
+            <form id="book-form">
+                <div class="form-group">
+                    <label for="title">Book Title</label>
+                    <input type="text" id="title" required placeholder="e.g. Dune">
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Author Name</label>
+                    <input type="text" id="author" required placeholder="e.g. Frank Herbert">
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Reading Status</label>
+                    <select id="status">
+                        <option value="Plan to Read">Plan to Read</option>
+                        <option value="Reading">Reading</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <a href="library.html" class="btn-cancel">Cancel</a>
+                    <button type="submit" id="submit-btn" class="btn-submit">Save Book</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookId = urlParams.get('id'); // Looks for ?id=XYZ in URL
+        const form = document.getElementById('book-form');
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (bookId) {
+                // Change UI titles to show Edit state
+                document.getElementById('page-title').innerText = "Edit Book";
+                document.getElementById('form-heading').innerText = "Modify Book Details";
+                document.getElementById('submit-btn').innerText = "Save Changes";
+
+                const book = await api.getBookById(bookId);
+                if (book) {
+                    document.getElementById('title').value = book.title;
+                    document.getElementById('author').value = book.author;
+                    document.getElementById('status').value = book.status;
+                } else {
+                    alert("Book not found!");
+                    window.location.href = 'library.html';
+                }
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const bookData = {
+                title: document.getElementById('title').value,
+                author: document.getElementById('author').value,
+                status: document.getElementById('status').value
+            };
+
+            if (bookId) {
+                await api.updateBook(bookId, bookData);
+            } else {
+                await api.createBook(bookData);
+            }
+
+            window.location.href = 'library.html';
+        });
+    </script>
+</body>
+</html>

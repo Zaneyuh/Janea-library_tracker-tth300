@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Library Collection</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">📚 Library Tracker</div>
+        <div class="nav-links">
+            <a href="index.html">Dashboard</a>
+            <a href="library.html" class="active">View Books</a>
+            <a href="book-form.html" class="btn-primary">+ Add Book</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="header-action">
+            <h1>My Library</h1>
+        </div>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="books-table-body">
+                <!-- Data injected via JavaScript -->
+            </tbody>
+        </table>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        const tableBody = document.getElementById('books-table-body');
+
+        async function loadBooks() {
+            const books = await api.getAllBooks();
+            tableBody.innerHTML = '';
+
+            if (books.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No books found. Add one to get started!</td></tr>`;
+                return;
+            }
+
+            books.forEach(book => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${book.title}</strong></td>
+                    <td>${book.author}</td>
+                    <td><span class="badge badge-${book.status.toLowerCase().replace(/\s+/g, '-')}">${book.status}</span></td>
+                    <td>
+                        <a href="book-form.html?id=${book.id}" class="btn-edit">Edit</a>
+                        <button class="btn-delete" data-id="${book.id}">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Global click handler to capture dynamic Delete buttons
+        document.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('btn-delete')) {
+                const bookId = e.target.getAttribute('data-id');
+                if (confirm('Are you sure you want to remove this book?')) {
+                    await api.deleteBook(bookId);
+                    loadBooks(); // Re-render table components
+                }
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', loadBooks);
+    </script>
+</body>
+</html>

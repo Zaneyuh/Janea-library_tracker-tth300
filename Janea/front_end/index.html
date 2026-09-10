@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">📚 Library Tracker</div>
+        <div class="nav-links">
+            <a href="index.html" class="active">Dashboard</a>
+            <a href="library.html">View Books</a>
+            <a href="book-form.html" class="btn-primary">+ Add Book</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1>Welcome Back, Reader!</h1>
+        <p>Here is your current reading breakdown.</p>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Books</h3>
+                <p id="total-count">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Currently Reading</h3>
+                <p id="reading-count" class="text-warning">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Completed</h3>
+                <p id="completed-count" class="text-success">0</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+            const books = await api.getAllBooks();
+            
+            const total = books.length;
+            const reading = books.filter(b => b.status === 'Reading').length;
+            const completed = books.filter(b => b.status === 'Completed').length;
+
+            document.getElementById('total-count').innerText = total;
+            document.getElementById('reading-count').innerText = reading;
+            document.getElementById('completed-count').innerText = completed;
+        });
+    </script>
+</body>
+</html>
