@@ -1,43 +1,52 @@
-const getStorageBooks = () => JSON.parse(localStorage.getItem('books')) || [];
-const saveStorageBooks = (books) => localStorage.setItem('books', JSON.stringify(books));
+const API_URL = "/Integ-Prog/Janea/back_end";
 
 const api = {
-    // READ ALL
+
+    // GET ALL BOOKS
     getAllBooks: async () => {
-        return getStorageBooks();
+        const response = await fetch(`${API_URL}/get_books.php`);
+        return await response.json();
     },
 
-    // READ ONE (For editing)
+    // GET ONE BOOK
     getBookById: async (id) => {
-        const books = getStorageBooks();
-        return books.find(book => book.id === id) || null;
+        const response = await fetch(`${API_URL}/get_book.php?id=${id}`);
+        return await response.json();
     },
 
-    // CREATE
+    // ADD BOOK
     createBook: async (bookData) => {
-        const books = getStorageBooks();
-        const newBook = { 
-            id: Date.now().toString(), // Generates a unique string ID
-            ...bookData 
-        };
-        books.push(newBook);
-        saveStorageBooks(books);
-        return newBook;
+        const response = await fetch(`${API_URL}/add_book.php`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(bookData)
+        });
+
+        return await response.json();
     },
 
-    // UPDATE
-    updateBook: async (id, updatedData) => {
-        let books = getStorageBooks();
-        books = books.map(book => book.id === id ? { ...book, ...updatedData } : book);
-        saveStorageBooks(books);
-        return true;
+    // UPDATE BOOK
+    updateBook: async (id, bookData) => {
+        const response = await fetch(`${API_URL}/update_book.php?id=${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(bookData)
+        });
+
+        return await response.json();
     },
 
-    // DELETE
+    // DELETE BOOK
     deleteBook: async (id) => {
-        let books = getStorageBooks();
-        books = books.filter(book => book.id !== id);
-        saveStorageBooks(books);
-        return true;
+        const response = await fetch(`${API_URL}/delete_book.php?id=${id}`, {
+            method: "DELETE"
+        });
+
+        return await response.json();
     }
+
 };
